@@ -1,4 +1,4 @@
-## Day 1
+## Day 1 - 1/23/22
 **Goal**: to finalize the topic and possible design
 Decided to go with the pet harness and attempted to design it physically. We should be able to mount it on a harness, however the container must be small. We would have to see what weight cats can carry ethically in order to make sure we aren’t causing it discomfort
 
@@ -8,16 +8,23 @@ Visualizing the entire design to look something like this hopefully:
 
 [60f97af1fc253600181fca2f](https://user-images.githubusercontent.com/67648243/166885097-ee936946-f360-46b7-88a1-52c524875a9d.png)
 
+## Day 2 - 2/2/22
+**Goal**: Research to see actual plausability
+Spoke to the partners and did some research. Found that accelerometer was very uncertain in telling you actual distance, but we could find some kind of qualitative metric based on change instead of static values. This seems worth exploring. Temperature is reliable. I think that especially because cats have fur it will be better insulated. Pulse sensor is the most problematic - will we be able to account for the damping via fur? On top of that, I think oximeters use IR and the fur would disable that. We would have to use something like an EKG. 
 
-## Day 2
+
+## Day 3 - 2/8/22
 **Goal**: To modularize the design
 Planned to determine important components and start thinking of a modular design for each. Narrowed it down to control unit, sensing unit, physical unit. If we get important data, we need to display it correctly somehow. LCD on device would make it heavier and more dangerous. Phone/laptop app would have to do.
 Kind of a block diagram here, would have to review. Need to store the data before sending – would need SD-card if on chip memory is not enough.
+
+![blockkkk](https://user-images.githubusercontent.com/67648243/167033805-2dddfcac-a4c7-4968-a667-50be1faeb8a7.png)
+
 Connection was decided the be via Bluetooth and data would be parsed on an android app. Hope to get data in some form of string or array, but it would probably require some parsing on the microcontroller side before we can do that. 
 
-Sensors would have to be placed optimally for the best readings. After inspection on a cat and some research (link), found that temperature and pulse behind the front legs would be best. Acceleration would have to be placed in such a way that it does not experience too many movements as the cat does its normal things. 
+Sensors would have to be placed optimally for the best readings. After inspection on a cat and some research (http://www.vetstreet.com/dr-marty-becker/check-your-cats-vital-signs-at-home), found that temperature and pulse behind the front legs would be best. Acceleration would have to be placed in such a way that it does not experience too many movements as the cat does its normal things. 
 
-## Day 3
+## Day 4 - 2/18/22
 **Goal**: look for parts and tradeoffs
 
 Sensing is quite clearly the most important. So we decided our sensors today, along with backups. The main sensors were as follows:
@@ -36,16 +43,15 @@ Pulse there was another one but that needed to be mounted onto a PCB it was a sm
 
 
 
-## Day 4
-
+## Day 5 - 2/20/22
 **Goal** : choose other components
 
 Still need to figure out power supply and the actual microcontroller we use. Don’t want to have a Bluetooth module separately – would take more space – not ideal.
-Options so far are – variants of ESP32, Bluefruit Feather 32u4, ATMega (?) link all
+Options so far are – variants of ESP32(https://www.mouser.com/c/?q=ESP32), Bluefruit Feather 32u4(https://www.mouser.com/new/adafruit/adafruit-feather-32u4-bluefruit-le/), ATMega? (https://www.mouser.com/c/?q=atmega328)
 Likely to go with ESP-32 due to nicer pinout and apparently less issues with programming. This would work with some kind of USB programmer I assume. Still open to discussion within the team. 
 Power supply probably would turn out to be 3.3 or 3.7V since that falls in the operating range of all the sensors. SD-card reader module would also have to be picked such that it fits this power requirement. 
 
-## Day 5
+## Day 6 - 2/23/22
 **Goal** : Make a list of specific features we want to implement.
 
 For the app:
@@ -69,29 +75,36 @@ Overall:
 2. Can't have PCB overheat so need to take care with power calc and use oscilloscope
 3. The transfer should be quick
 
-## Day 6
+## Day 7 - 2/27/22
 
 **Goal**: Figuring out SPI communications and ADC logic
 
-For ADC, it seems pretty straightforward and can follow the tutorial here :
+For ADC, it seems pretty straightforward and can follow the tutorial here : https://learn.adafruit.com/tmp36-temperature-sensor/using-a-temp-sensor
 
 For SPI communication, I understand that there is a master-slave relation and one Din and Dout port each. LINK said something about there being the first 4 clock cycles for setup, but would have to look into that further. essentially need to initialize the ESP-32 (finally decided) to master and each sensor and SD-card as slave. ESP-32 has 3 SPI interfaces so that is great for us. 
 
-ADD SPI DIAGRAM 
+![spi](https://user-images.githubusercontent.com/67648243/167034346-a8d65ebc-4d43-4ad8-a696-5597cfd6038f.jpg)
 
 Seem to have thought of an algorithm for SPI initialization.
 
-## Day 7
+## Day 8 - 2/29/22
+**Goal** - PCB Design
+We started out PCB design today, and had all the upper layer schematic components set up. We did not yet actually create the board with the wirings on it, but made sure to get the upper layer set up. We created a dev board suited to our purposes. We had connectors for UART, power, IO pins and SPI pins for the microcontroller, along with buttons. Below is the schematic for what we designed. We did not do power yet
+
+![hh](https://user-images.githubusercontent.com/67648243/167034995-6920392a-92ce-4d55-a5c9-601c99fd3173.png)
+
+
+## Day 9 - 1/3/22
 
 **Goal**: Figure out bluetooth and start possibly ordering parts
 
-Bluetooth on the microcontroller end is easy. We can use the SerialBT interface. Just need to being the BT serial port using begin() and then check for whether .read() returns a value. The problem on this end, I believe, will be setting up the android side. I read the documentation at _______ but it seems like a lot of the functions are deprecated. Not that I have android experience, but I'm going to figure it out today.
+Bluetooth on the microcontroller end is easy. We can use the SerialBT interface. Just need to being the BT serial port using begin() and then check for whether .read() returns a value. The problem on this end, I believe, will be setting up the android side. I read the documentation at https://developer.android.com/guide/topics/connectivity/bluetooth but it seems like a lot of the functions are deprecated. Not that I have android experience, but I'm going to figure it out today.
 
 Each page is a fragment that is its own class (a subclass of the MainActivity). Now a class for bluetooth connection with all the functions for parsing the data in there too would work. Could instantiate a barebones dataless class in the fragment that I want to actually parse data in, decide where to go next, and then instantiate now a parametric bluetooth class that I would use to call the parsers. Seems like a decent idea, below is a flowchart.
 
 FLOWCHART PLS
 
-## Day 8
+## Day 9 - 5/3/22 
 
 **Goal**: Actually look at PCB 
 
