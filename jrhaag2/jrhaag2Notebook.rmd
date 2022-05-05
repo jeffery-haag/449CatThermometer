@@ -1,0 +1,109 @@
+## 1/22
+**Goal**: Brainstorm Ideas\
+Today we brainstomed several idea such as a drone to take measurements for a forest fire or general weather. I was partial to the idea of an alarm clock that would heat your clothes up in the morning, so you can wear warm clothes as soon as you wake up, since this is something i struggled with back home where my house is about 65 degrees when i wake up.
+
+## 2/2
+**Goal**: Finalize Ideas\
+Since the previous alarm clock idea was denied, for dubios reasons in my opinion, we decided to go with a cat thermometer. We formalized the project and submitted for project approval. The invention will look like a small box attached to a harness people use to walk their dogs. The sensor will either touch the cat or be mounted on the box.
+
+## 2/10
+**Goal**: Do proposal and research idea\
+We wrote up the proposal and did research to what sensors we could use.
+
+We decided we could have possibly around 3-4 sensors. Temperature, pulse rate, acceleromter/gps seemed lik the best. Initial research showed us a really convenient temperature sensor the TMP36. This will work well, and I also found a web resource regerding converting the skin temp to a core body temperature. It points out areas on the cat that will work best.
+
+Visualizing the entire design to look something like this hopefully:
+
+
+
+## Day 2
+**Goal**: To modularize the design
+Planned to determine important components and start thinking of a modular design for each. Narrowed it down to control unit, sensing unit, physical unit. If we get important data, we need to display it correctly somehow. LCD on device would make it heavier and more dangerous. Phone/laptop app would have to do.
+Kind of a block diagram here, would have to review. Need to store the data before sending – would need SD-card if on chip memory is not enough.
+Connection was decided the be via Bluetooth and data would be parsed on an android app. Hope to get data in some form of string or array, but it would probably require some parsing on the microcontroller side before we can do that. 
+
+Sensors would have to be placed optimally for the best readings. After inspection on a cat and some research (link), found that temperature and pulse behind the front legs would be best. Acceleration would have to be placed in such a way that it does not experience too many movements as the cat does its normal things. 
+
+## Day 3
+**Goal**: look for parts and tradeoffs
+
+Sensing is quite clearly the most important. So we decided our sensors today, along with backups. The main sensors were as follows:
+1.	Temperature – TMP36 (link)
+2.	Accelerometer – ADXL343
+3.	Pulse – Adafruit 1093
+Temperature sensor has a good operating range for our purpose. Pulse sensor seems light and durable but would have to go through the datasheet well enough to check all requirements. Accelerometer gives acceleration data in 3 axes – could be used for finding time spent active and inactive if distance does not work out. 
+As seen below, more or less the final positions of the sensors. 
+
+Temp sensor would also work the best I feel since it had a thermocouple and that would be insulated by fur if placed right as you can see here. 
+
+   ![612365723d652740479](https://user-images.githubusercontent.com/67648243/166885431-6c43401e-e55a-4f10-8c2e-8bec203d0527.png)
+
+Pulse there was another one but that needed to be mounted onto a PCB it was a small pulse oximeter thing. Dont know if its a good idea to have another small PCB. 
+        ![jdjd](https://user-images.githubusercontent.com/67648243/166885586-e0221d56-1295-484a-bb74-f68aca3d4ffd.png)
+
+
+
+## Day 4
+
+**Goal** : choose other components
+
+Still need to figure out power supply and the actual microcontroller we use. Don’t want to have a Bluetooth module separately – would take more space – not ideal.
+Options so far are – variants of ESP32, Bluefruit Feather 32u4, ATMega (?) link all
+Likely to go with ESP-32 due to nicer pinout and apparently less issues with programming. This would work with some kind of USB programmer I assume. Still open to discussion within the team. 
+Power supply probably would turn out to be 3.3 or 3.7V since that falls in the operating range of all the sensors. SD-card reader module would also have to be picked such that it fits this power requirement. 
+
+## Day 5
+**Goal** : Make a list of specific features we want to implement.
+
+For the app:
+1.	Parse incoming data successfully
+2.	Display metrics on app
+3.	Be able to receive data from the SD-card (upper limit?)
+4.	Not crash!
+
+For the sensors:
+1.	From temp sensor we want actual temp values. So we would need some ADC logic in the control unit.
+2.	Accelerometer will be uncertain but we should try to minimize uncertainty. would 1/2 at^2 work
+3.	Pulse we would want EKG like readings but again would have to do that in control unit
+
+Control unit:
+1. Handle all the SD card stuff, sensors parsing (ADC or SPI I/O setup)
+2. power states 
+3. Bluetooth transmission
+
+Overall:
+1. Need it to be very comfortable. So snug, but not too tight 
+2. Can't have PCB overheat so need to take care with power calc and use oscilloscope
+3. The transfer should be quick
+
+## Day 6
+
+**Goal**: Figuring out SPI communications and ADC logic
+
+For ADC, it seems pretty straightforward and can follow the tutorial here :
+
+For SPI communication, I understand that there is a master-slave relation and one Din and Dout port each. LINK said something about there being the first 4 clock cycles for setup, but would have to look into that further. essentially need to initialize the ESP-32 (finally decided) to master and each sensor and SD-card as slave. ESP-32 has 3 SPI interfaces so that is great for us. 
+
+ADD SPI DIAGRAM 
+
+Seem to have thought of an algorithm for SPI initialization.
+
+## Day 7
+
+**Goal**: Figure out bluetooth and start possibly ordering parts
+
+Bluetooth on the microcontroller end is easy. We can use the SerialBT interface. Just need to being the BT serial port using begin() and then check for whether .read() returns a value. The problem on this end, I believe, will be setting up the android side. I read the documentation at _______ but it seems like a lot of the functions are deprecated. Not that I have android experience, but I'm going to figure it out today.
+
+Each page is a fragment that is its own class (a subclass of the MainActivity). Now a class for bluetooth connection with all the functions for parsing the data in there too would work. Could instantiate a barebones dataless class in the fragment that I want to actually parse data in, decide where to go next, and then instantiate now a parametric bluetooth class that I would use to call the parsers. Seems like a decent idea, below is a flowchart.
+
+FLOWCHART PLS
+
+## Day 8
+
+**Goal**: Actually look at PCB 
+
+None of us have done PCB design before, so would have to make sure that we do the PCB design right. We saw this resource online for making a dev-board ______ link to pcbway but we knew we had to actually adapt it to our needs. better routing, component placement, and more specific parts. 
+
+I assume RX and TX are for the connection to the programmer. If that's the case, then we'd need a lot of connectors on the board. For that, IO pins, and even power in. Cheap and available on Amazon, should not be an issue to get them whenever. ESP-32 should be ordered soon since they're in low supply it seems. I checked mouser and they had no stock so I went to another website that had stock. 
+
+ 
