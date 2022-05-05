@@ -439,9 +439,7 @@ We are done! built everything, so decided to test on the cat. Cat seems comforta
 
 ![catto](https://user-images.githubusercontent.com/67648243/167042789-17aff4d9-4cba-4040-bd79-35788bd1ee58.png)
 
-## Thank you!
-
-## Credits
+## Acknowledgements
 1. Hojoon Ryu (TA) for constant guidance and support throughout
 2. Pengfei Song (Professor) for pre-empting the pulse sensor issue and directing us to use accelerometer data for qualitative results
 3. Sanjana Sastry (Test Subject Owner) for letting us test on Jasper!
