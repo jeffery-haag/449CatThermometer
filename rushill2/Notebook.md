@@ -28,10 +28,11 @@ Temperature sensor has a good operating range for our purpose. Pulse sensor seem
 As seen below, more or less the final positions of the sensors. 
 
 Temp sensor would also work the best I feel since it had a thermocouple and that would be insulated by fur if placed right as you can see here. 
-![612365723d652740479](https://user-images.githubusercontent.com/67648243/166885431-6c43401e-e55a-4f10-8c2e-8bec203d0527.png)
+
+    ![612365723d652740479](https://user-images.githubusercontent.com/67648243/166885431-6c43401e-e55a-4f10-8c2e-8bec203d0527.png)
 
 Pulse there was another one but that needed to be mounted onto a PCB it was a small pulse oximeter thing. Dont know if its a good idea to have another small PCB. 
-![jdjd](https://user-images.githubusercontent.com/67648243/166885586-e0221d56-1295-484a-bb74-f68aca3d4ffd.png)
+        ![jdjd](https://user-images.githubusercontent.com/67648243/166885586-e0221d56-1295-484a-bb74-f68aca3d4ffd.png)
 
 
 
