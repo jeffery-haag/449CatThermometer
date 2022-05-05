@@ -94,9 +94,9 @@ We started out PCB design today, and had all the upper layer schematic component
 ![hh](https://user-images.githubusercontent.com/67648243/167034995-6920392a-92ce-4d55-a5c9-601c99fd3173.png)
 
 
-## Day 9 - 1/3/22
+## Day 9 - 3/1/22
 
-**Goal**: Figure out bluetooth and start possibly ordering parts
+**Goal**: Figure out bluetooth 
 
 Bluetooth on the microcontroller end is easy. We can use the SerialBT interface. Just need to being the BT serial port using begin() and then check for whether .read() returns a value. The problem on this end, I believe, will be setting up the android side. I read the documentation at https://developer.android.com/guide/topics/connectivity/bluetooth but it seems like a lot of the functions are deprecated. Not that I have android experience, but I'm going to figure it out today.
 
@@ -104,12 +104,80 @@ Each page is a fragment that is its own class (a subclass of the MainActivity). 
 
 FLOWCHART PLS
 
-## Day 9 - 5/3/22 
+## Day 10 - 3/5/22 
 
-**Goal**: Actually look at PCB 
+**Goal**: Actually look at wiring PCB and start possibly ordering parts
 
-None of us have done PCB design before, so would have to make sure that we do the PCB design right. We saw this resource online for making a dev-board ______ link to pcbway but we knew we had to actually adapt it to our needs. better routing, component placement, and more specific parts. 
+None of us have done kiCAD PCB design before, so would have to make sure that we do the PCB design right. We have to use footprints from the parts we need, so we would have to chart out the power unit schematic for the PCB too, to get regulators we need. Below is the schematic for the power unit we designed. 
+
+![power](https://user-images.githubusercontent.com/67648243/167035165-075d5137-86c9-4a3c-ad00-d61efbbeeab0.png)
 
 I assume RX and TX are for the connection to the programmer. If that's the case, then we'd need a lot of connectors on the board. For that, IO pins, and even power in. Cheap and available on Amazon, should not be an issue to get them whenever. ESP-32 should be ordered soon since they're in low supply it seems. I checked mouser and they had no stock so I went to another website that had stock. 
 
- 
+Would have to do actual PCB wiring later after verifying the power system working. 
+
+
+## Day 11 - 3/8/22 
+
+**Goal**: Pre-Break meeting
+
+We planned on wiring the PCB once we met after the break ended. I would look into getting sources for our parts so we could order from the University account. I went to the website and figured out how to do the order. Made a list of all the parts. We knew we would need a regulator to 3.3V and I found the LM1117(https://www.ti.com/lit/gpn/lm1117) to be a good fit. Will use this along with buttons, plate resistors of 10k ohms, a 37uF capacitor and a Diode. Spoke to the owner of the cat we were planning on testing on. My roommate has a cat but he's too big and too furry, wouldn't be good for us. Plus the cat's a drama queen. 
+
+## Day 12 - 3/20/22
+
+**Goal**: App work
+
+I decided to go ahead and work on the app. I set up a bluetooth Adapter that would allow me to get a bluetooth manager. Using this manager I would create a socket to the ESP-32 that would check for the MAC address of that device only. I would then try to connect to the socket. Once this happened, data that was staged on the SD-card would be sent in. I also figured out that arduino and android both are capable of directly streaming data, and that may be qay quicker than collection, storage and then sending. https://techtutorialsx.com/2018/03/13/esp32-arduino-bluetooth-over-serial-receiving-data/ showed me a little more on how to do that. 
+
+So far I had this code done: 
+
+        BluetoothAdapter Mbt = BM.getAdapter();
+        String deviceName = "Cat Thermometer";
+        BluetoothDevice result = null;
+        Set<BluetoothDevice> devices = Mbt.getBondedDevices();
+        if (devices != null) {
+            for (BluetoothDevice device : devices) {
+                if (deviceName.equals(device.getName())) {
+                    result = device;
+                    Log.i("deviceName", result.getName());
+                    break;
+                }
+            }
+        }
+        if (result != null){
+            Log.d("BT", "Trying Socket...");
+            UUID MY_UUID = result.getUuids()[0].getUuid();
+            socket=result.createRfcommSocketToServiceRecord(MY_UUID);
+            this.serverSocket = Mbt.listenUsingRfcommWithServiceRecord("test", result.getUuids()[0].getUuid()); // 1
+            Log.d("BT", "Got Socket!");
+        } else{
+            this.socket = null;
+            this.cancelled = true;
+            Log.d("bluetooth", "failed bt socket");
+        }
+This would create a socket object I could try to connect to. Also added some basic buttons on the home screen for pairing. Would still need to know the MAC address of the thing. 
+
+
+## Day 13 - 3/21/22 
+**Goal**- More app work
+
+Fleshed out a good looking front-end. changed the background, colors and cleaned up the code to improve socket creation latency and load times. Did some further work on the bluetooth side and set up this small chunk of code in the BluetoothHandler Class
+
+        this.cancelled = false;
+        if (Mbt.isEnabled()){
+        } else{
+            Mbt.enable();
+        }
+        byte[] buf = new byte[2048];
+        int bytes;
+        OutputStream tmpOut = null;
+        InputStream tmpIn = null;
+        if(socket!=null){
+            Log.d("BT", "Connecting...");
+            socket.connect();
+            Log.d("BT", "Connected!!"); }
+            
+So ideally this could should show me the connection status and connect to the device. I believe there hasn't been much work done on the arduino end therefore would have to check with the teammates and try to get MAC address. Additionally, I believe that the next step here would be to get something called an inputStream I saw in the documentation here - https://developer.android.com/reference/java/io/InputStream
+
+Below is an image of home screen front-end
+![appdesign](https://user-images.githubusercontent.com/67648243/167036506-6560e0da-9b0b-4708-9cdd-946171614ca0.png)
