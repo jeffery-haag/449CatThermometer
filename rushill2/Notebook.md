@@ -1,0 +1,62 @@
+## Day 1
+Goal: to finalize the topic and possible design
+Decided to go with the pet harness and attempted to design it physically. We should be able to mount it on a harness, however the container must be small. We would have to see what weight cats can carry ethically in order to make sure we aren’t causing it discomfort
+
+Could have possibly around 3-4 sensors. Temperature, heart rate and movement seem important, so we shall go with 3. Initial research showed us a really convenient temperature sensor the TMP36 (link). We found a 3-axis adafruit accelerometer, but would we need GPS too? Pulse monitor is the largest variable based on if it works or not. Would have to research into pulse-oximeter type sensor and see whether it can be clipped on the ear of the cat safely. 
+
+Visualizing the entire design to look something like this hopefully:
+
+(ADD CAT PIC FROM DD)
+
+## Day 2
+Goal: To modularize the design
+Planned to determine important components and start thinking of a modular design for each. Narrowed it down to control unit, sensing unit, physical unit. If we get important data, we need to display it correctly somehow. LCD on device would make it heavier and more dangerous. Phone/laptop app would have to do.
+Kind of a block diagram here, would have to review. Need to store the data before sending – would need SD-card if on chip memory is not enough.
+Connection was decided the be via Bluetooth and data would be parsed on an android app. Hope to get data in some form of string or array, but it would probably require some parsing on the microcontroller side before we can do that. 
+
+Sensors would have to be placed optimally for the best readings. After inspection on a cat and some research (link), found that temperature and pulse behind the front legs would be best. Acceleration would have to be placed in such a way that it does not experience too many movements as the cat does its normal things. 
+
+## Day 3
+Goal: look for parts and tradeoffs
+Sensing is quite clearly the most important. So we decided our sensors today, along with backups. The main sensors were as follows:
+1.	Temperature – TMP36 (link)
+2.	Accelerometer – ADXL343
+3.	Pulse – Adafruit 1093
+Temperature sensor has a good operating range for our purpose. Pulse sensor seems light and durable but would have to go through the datasheet well enough to check all requirements. Accelerometer gives acceleration data in 3 axes – could be used for finding time spent active and inactive if distance does not work out. 
+As seen below, more or less the final positions of the sensors. 
+
+## Day 4
+
+Goal : choose other components
+
+Still need to figure out power supply and the actual microcontroller we use. Don’t want to have a Bluetooth module separately – would take more space – not ideal.
+Options so far are – variants of ESP32, Bluefruit Feather 32u4, ATMega (?) link all
+Likely to go with ESP-32 due to nicer pinout and apparently less issues with programming. This would work with some kind of USB programmer I assume. Still open to discussion within the team. 
+Power supply probably would turn out to be 3.3 or 3.7V since that falls in the operating range of all the sensors. SD-card reader module would also have to be picked such that it fits this power requirement. 
+
+## Day 5
+Goal : Make a list of specific features we want to implement.
+
+For the app:
+1.	Parse incoming data successfully
+2.	Display metrics on app
+3.	Be able to receive data from the SD-card (upper limit?)
+4.	Not crash!
+
+For the sensors:
+1.	From temp sensor we want actual temp values. So we would need some ADC logic in the control unit.
+2.	Accelerometer will be uncertain but we should try to minimize uncertainty. would 1/2 at^2 work
+3.	Pulse we would want EKG like readings but again would have to do that in control unit
+
+Control unit:
+1. Handle all the SD card stuff, sensors parsing (ADC or SPI I/O setup)
+2. power states 
+3. Bluetooth transmission
+
+Overall:
+1. Need it to be very comfortable. So snug, but not too tight 
+2. Can't have PCB overheat so need to take care with power calc and use oscilloscope
+3. The transfer should be quick
+
+
+ 
