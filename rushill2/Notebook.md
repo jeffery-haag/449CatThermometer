@@ -194,3 +194,40 @@ Below is the design for these pages. Made one for the loading screen while we wa
 ![appd3](https://user-images.githubusercontent.com/67648243/167038285-0b4d091f-79c8-4ec8-98dc-04b91e416bf3.png)
 ![appd4](https://user-images.githubusercontent.com/67648243/167038288-2f62d46d-d457-41bd-aac7-46bf1b73a585.png)
 
+
+## Day 15 - 4/27/22
+
+**Goal**- FINALLY connecting to bluetooth
+
+Ran a simple script that would create a fake bluetooth device and then tried to connect to that MAC as the endpoint. I set up the functions for getting the input from the device, and on talking to Tanmay and Jeff we figured that we would get a stream of raw bytes that I would have to convert to a string or tuples in order to make the data parseable. 
+
+Below is code for the inputStream setup. Curious to check outputStream and see if we can send Arduino a kill-switch from the phone. 
+
+        int i = 0;
+        int inval = 0;
+        while(true){
+            boolean flag = false;
+            String message = null;
+                try{
+                    if(i==10){
+                        break;
+                    }
+                    tmpIn = this.socket.getInputStream();
+                    inval = tmpIn.read(buf);
+                    message = new String(buf, 0, inval);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(message.contains("ece445") | inval == 4){
+                    return true;
+                }
+                else{
+                    proc(message, inval, m, i);
+                }
+                i += 1;
+        }
+        return true;
+    }
+
+Think of proc as a black box function for now that sends parses the data and sends it to handler functions for each one. 
+
