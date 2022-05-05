@@ -68,6 +68,8 @@ WE started the actual soldering work on the pcb. Sodlering the esp32 was a huge 
 ## ~`4/22
 **Goal** : General work
 We recieved the programmer and it does program. I begain the code to do SD card reading, controll flow, and tthe sensor code in arduino. Rushil mainly is working on the app to get that operational. The code hasn't been tested, but most of the content is there as well as it compiling.
+![unnamed](https://user-images.githubusercontent.com/71428266/167028391-359b36b7-b97c-41b2-a807-fadac41241c2.png)
+
 
 ## ~4/24
 **Goal** : General work
@@ -75,4 +77,6 @@ It's a bit rough, but PCB won't work. Either it never worked, or we burn it out 
 
 ## ~4/25
 **Goal** : General work
-WE got all sensors working pretty early on so we tested with the cat. We were able to tell pretty early on that some of the sensros we ordered were just garbage so didn't even bother with those. The pulse sensors didn't even work on humans so we obtained an EKG sensor. This worked on humans, but relied on a sticky adhesive to work and we were uncomfortable putting this on a cate so we deiced to give up on pulse sensor We then needed to integrate witht the App so a large portion of time was spent on the app. While this was going on, we started physcialy constructing the device so it would be ready when the app was. We worked very late into the night and had to scrap a box together for the dev board because it was a different size thean the planned pcb so we didnt have one that could work.
+WE got all sensors working pretty early on so we tested with the cat. We were able to tell pretty early on that some of the sensros we ordered were just garbage so didn't even bother with those. The pulse sensors didn't even work on humans so we obtained an EKG sensor. This worked on humans, but relied on a sticky adhesive to work and we were uncomfortable putting this on a cate so we deiced to give up on pulse sensor We then needed to integrate witht the App so a large portion of time was spent on the app. While this was going on, we started physcialy constructing the device so it would be ready when the app was. We worked very late into the night and had to scrap a box together for the dev board because it was a different size thean the planned pcb so we didnt have one that could work.![cat](https://user-images.githubusercontent.com/71428266/167028453-d0120506-25f9-47ce-b286-2964c3d3f6d7.jpg)
+
+Overall it looks ok, the cat is very cute which should cover up some of the uglieness of the device.
