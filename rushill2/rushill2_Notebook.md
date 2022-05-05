@@ -1,3 +1,6 @@
+# ECE 445 Project Notebook - Pet Health Monitor 
+netid - rushill2
+
 ## Day 1 - 1/23/22
 **Goal**: to finalize the topic and possible design
 Decided to go with the pet harness and attempted to design it physically. We should be able to mount it on a harness, however the container must be small. We would have to see what weight cats can carry ethically in order to make sure we aren’t causing it discomfort
