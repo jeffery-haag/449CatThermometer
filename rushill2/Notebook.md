@@ -181,3 +181,16 @@ So ideally this could should show me the connection status and connect to the de
 
 Below is an image of home screen front-end
 ![appdesign](https://user-images.githubusercontent.com/67648243/167036506-6560e0da-9b0b-4708-9cdd-946171614ca0.png)
+
+## Day 14 - 3/24/22
+
+**Goal**- EVEN MORE app work
+
+Created the second page and page layouts for the Movement, Pulse and Temperature Data. Learned som basic XML in order to create TextViews, but will have to learn how to assign them programmatically and create graphs (maybe? might not do if too hard)
+
+Below is the design for these pages. Made one for the loading screen while we wait for the data to come in from SD-card
+
+![appd2](https://user-images.githubusercontent.com/67648243/167038281-10d85749-540b-49d7-9172-79abd1eeb273.png)
+![appd3](https://user-images.githubusercontent.com/67648243/167038285-0b4d091f-79c8-4ec8-98dc-04b91e416bf3.png)
+![appd4](https://user-images.githubusercontent.com/67648243/167038288-2f62d46d-d457-41bd-aac7-46bf1b73a585.png)
+
