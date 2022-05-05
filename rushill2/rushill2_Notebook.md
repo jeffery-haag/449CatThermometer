@@ -100,9 +100,7 @@ We started out PCB design today, and had all the upper layer schematic component
 
 Bluetooth on the microcontroller end is easy. We can use the SerialBT interface. Just need to being the BT serial port using begin() and then check for whether .read() returns a value. The problem on this end, I believe, will be setting up the android side. I read the documentation at https://developer.android.com/guide/topics/connectivity/bluetooth but it seems like a lot of the functions are deprecated. Not that I have android experience, but I'm going to figure it out today.
 
-Each page is a fragment that is its own class (a subclass of the MainActivity). Now a class for bluetooth connection with all the functions for parsing the data in there too would work. Could instantiate a barebones dataless class in the fragment that I want to actually parse data in, decide where to go next, and then instantiate now a parametric bluetooth class that I would use to call the parsers. Seems like a decent idea, below is a flowchart.
-
-FLOWCHART PLS
+Each page is a fragment that is its own class (a subclass of the MainActivity). Now a class for bluetooth connection with all the functions for parsing the data in there too would work. Could instantiate a barebones dataless class in the fragment that I want to actually parse data in, decide where to go next, and then instantiate now a parametric bluetooth class that I would use to call the parsers. Seems like a decent idea.
 
 ## Day 10 - 3/5/22 
 
@@ -249,7 +247,7 @@ With the parts coming through late we finally got to solder. Soldered all the co
 
 ![peeseabee](https://user-images.githubusercontent.com/67648243/167041203-3bd328ef-fbb8-4cb5-bdef-df9ddb033bf9.png)
 
-# Day 18 - 4/21/22
+# Day 19 - 4/21/22
 **Goal**- App work
 
 I focussed on the app while jeff and tanmay started coding the microcontroller. Finally could test and the bluetooth worked! needed to test for input streams coming in. Once the data was received, I found that it was a string with tabs between each type of reading and spaces between axis values for the ADXL343. I did a simple split and parsed them into arrays in code seen below and then wrote the handler for temperature today. So far only max and average values are found. 
@@ -343,8 +341,107 @@ Code for the Temp Handler (jeff helped)
     
   ```
   
-  ## Day 19 - 4/20/22
+  ## Day 20 - 4/20/22
+  **Goal**- Fix the PCB issue hopefully
   
- 
+  Our PCB burnt out. We could program it, but the code never ran on it. While it was connected to the battery, we smelled some burning. I would say that is due to the dangling resistors that it burnt. its possible that a capacitor overloaded due to the resistors briding on our design. As you can see below the plate resistors would have worked, but we did not have time to get them. Below is the PCB design - we also realized that we missed a connection from the ESP to the SPI Clock port for one of the sensors. Instead of ordering a new PCB (too little time), we tried to use the dev-board for ESP-32 that we were testing on. 
+  
+Dev board is easy to use, and all we needed to do now was test on the cat for different sensor data.
+  
+  ![pcbdesign](https://user-images.githubusercontent.com/67648243/167041886-a70f65b1-589d-4721-aea3-0ab528d02bce.png)
 
 
+ ## Day 21 - 4/21/22
+  **Goal**- Design changes
+  
+  Discussed and figured out that the SD-Card was unnecessary. We could actually transmit bluetooth data real time useing the BLE or the SerialBT modules. We decided to go with SerialBT and with some quick setup everything worked fine. Below is the serialBT code setup with the mac address of the device saved
+  
+  ```
+  #include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+String MACadd = "10:97:BD:D4:9A:9C";
+
+void setup() {
+  Serial.begin(115200);
+  //SerialBT.setPin(pin);
+  SerialBT.begin("Cat Thermometer"); 
+  //SerialBT.setPin(pin);
+  Serial.println("The device started in master mode, make sure remote BT device is on!");
+
+void loop() {
+  int coumter = 0;
+  if (Serial.available()) {
+    SerialBT.write(Serial.read());
+  }
+  if (SerialBT.available()) {
+//    SerialBT.write((int)"Tanmay is gay");
+  }
+  String a = "page1oktt";
+  uint8_t buf[a.length()];
+  memcpy(buf,a.c_str(),a.length());
+  SerialBT.write(buf,a.length());
+  SerialBT.println(); 
+  delay(1000);
+  if (coumter > 45)
+    SerialBT.disconnect();
+}
+```
+
+
+ ## Day 21 - 4/23/22
+  **Goal**- Testing
+  
+  We tried using the temperature sensor only (not the entire system) on a cat and found the values to be acceptable. For acceleration, the change in axis acceleration actually gave us an interesting metric to try out. The pulse sensor however, did not work at all. We assumed that it was faulty because it did not work on us and used the backup. The problem with the backup was that it required an sticky gel to be used. I tried that on my arm, and some hairs came off. Would not want to use that on the cat. So abandoned it altogether. 
+  
+  I finally set up a decent acceleration handler that would take in the 3-axis values and give us an Activity Ratio, based on the delta state being greater than some threshold we decided after testing. 
+```
+  public float[] accHandler(MainActivity m){
+        float[] tempx = m.getXvals();
+        float[] tempy = m.getYvals();
+        float[] tempz = m.getZvals();
+        float value = 0;
+        float active = 0;
+        float inactive = 0;
+        float oldx = 0;
+        float oldy = 0;
+        float oldz = 0;
+        float useval = 0;
+        for (int i = 0; i<tempx.length; i++){
+            if(Math.abs(tempx[i]-oldx)+ Math.abs(tempy[i]-oldy)+Math.abs(tempz[i]-oldz)>2){
+                active += 1;
+            }
+            else{
+                inactive += 1;
+            }
+            float ret = (float) Math.sqrt(Math.pow(Math.abs(tempx[i]-oldx), 2) + Math.pow(Math.abs(tempy[i]-oldy), 2) + Math.pow(Math.abs(tempz[i]-oldz), 2));
+            ret = ret/9;
+            useval += ret;
+            value = (tempx[i] + tempy[i]);
+            oldx = tempx[i];
+            oldy = tempy[i];
+            oldz = tempz[i];
+        }
+        float activity_ratio = active/(inactive);
+        if(activity_ratio>0.25) activity_ratio += 0.2;
+        if(activity_ratio<0.1) useval = 0;
+        float[] sus = new float[]{activity_ratio, useval};
+        return sus;
+    }
+```
+
+## Day 21 - 4/25/22
+
+**Goal**- Final testing of the device pre-demo
+
+We are done! built everything, so decided to test on the cat. Cat seems comfortable and seems to not be bothered by the device. It is a little bulky, but that's because we couldn't find a container light enough for it. Temperature readings were great and accelerometer data did actually give us an indication of how active the cat has been. We had to use a weird box since our initial design for that did not work out. However, here is a picture of the cat wearing it. 
+
+![catto](https://user-images.githubusercontent.com/67648243/167042789-17aff4d9-4cba-4040-bd79-35788bd1ee58.png)
+
+## Thank you!
+
+## Credits
+1. Hojoon Ryu (TA) for constant guidance and support throughout
+2. Pengfei Song (Professor) for pre-empting the pulse sensor issue and directing us to use accelerometer data for qualitative results
+3. Sanjana Sastry (Test Subject Owner) for letting us test on Jasper!
