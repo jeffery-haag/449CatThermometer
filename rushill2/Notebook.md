@@ -231,3 +231,120 @@ Below is code for the inputStream setup. Curious to check outputStream and see i
 
 Think of proc as a black box function for now that sends parses the data and sends it to handler functions for each one. 
 
+## Day 16 - 4/4/22
+**Goal**- status updates and figuring out where we are
+
+Turns out we are rather behind with the PCB development. Ordered parts but did not do the same for resistors and capacitors. Other commitments prevented e from working on 445 for a while. Worked with Jeff further on the app, once the bluetooth connection was setup, debugging the code was ridiculously hard without the actual device to pair with. Decided to try to beautify the app and try to research on some graph XML layouts https://www.infoworld.com/article/3226733/graphlib-an-open-source-android-library-for-graphs.html
+
+
+## Day 17 - 4/8/22
+
+**Goal**- Debug the app
+More app work and debugging was a tedious process. We found that we were using a deprecated library and had to switch to CreateRFComm but with an insecure frequency. Security was not our concern for this design so we made changes to the code and saw progress. However we were still unable to test. Parts seem to be well on their way so we planned soldering duties and programming the microcontroller. SPI communications code was needed along with a generic state machine to handle SD-Card reads and writes. https://www.arduino.cc/reference/en/libraries/statemachine/
+
+## Day 18 - 4/18/22
+
+** Goal **- Start PCB development
+With the parts coming through late we finally got to solder. Soldered all the components on until we realized that the regulator we ordered was a REG1117 which was larger than an LM1117. Thankfully we found a TA with the regulator. Some of our resistors did not come through either, so instead of plate resistors, we would try to use breadboard resistors since we were crunched on time. We soldered all connectors, diodes, capacitors, resistors, and microcontroller on. Only need the UART soldered and did not hae female-female cables for that. Ended up with the PCB as seen here
+
+![peeseabee](https://user-images.githubusercontent.com/67648243/167041203-3bd328ef-fbb8-4cb5-bdef-df9ddb033bf9.png)
+
+# Day 18 - 4/21/22
+**Goal**- App work
+
+I focussed on the app while jeff and tanmay started coding the microcontroller. Finally could test and the bluetooth worked! needed to test for input streams coming in. Once the data was received, I found that it was a string with tabs between each type of reading and spaces between axis values for the ADXL343. I did a simple split and parsed them into arrays in code seen below and then wrote the handler for temperature today. So far only max and average values are found. 
+
+Code for the parser:
+```
+          public void proc(String data, int numbytes, MainActivity m, int i){
+              String[] usestring = null;
+      //        Log.d("NumBytes", String.valueOf(numbytes));
+              String[] accvals = new String[numbytes];
+              float[] tempx = new float[numbytes];
+              float[] tempy = new float[numbytes];
+              float[] tempz = new float[numbytes];
+              float[] tempv = new float[numbytes];
+              // parse data string into
+              usestring = data.split("\t", 3);
+              tempv[i] = Float.parseFloat(usestring[1]);
+              accvals[i] = usestring[0];
+              // parse accelerometer axis data
+              String[] split = accvals[i].split(",", 3);
+              tempx[i] = Float.parseFloat(split[0]);
+              tempy[i] = Float.parseFloat(split[1]);
+              tempz[i] = Float.parseFloat(split[2]);
+              m.setTempvals(numbytes, tempv, i);
+              int zerocnt = 0;
+              m.setYlist(numbytes, tempy, i);
+              for (float f: m.ylist){
+                  if(f==0){
+                      zerocnt += 1; }}
+              float[] dd = new float[30];
+              int j = 0;
+              int k = 0;
+              for (float f:m.ylist){
+                  if(f!=0){
+                      dd[j] = f;
+                      j += 1; }}
+              m.setYlist(numbytes, dd, i);
+              int n = 0;
+              float[] dk = new float[30];
+              m.setZlist(numbytes, tempz, i);
+              for (float f:m.ylist){
+                  if(f!=0){
+                      dk[n] = f;
+                      n += 1; }}
+              m.setZlist(numbytes, dk, i);
+              float[] dy = new float[30];
+              int p = 0;
+              m.setXlist(numbytes, tempx, i);
+              for (float f:m.ylist){
+                  if(f!=0){
+                      dy[p] = f;
+                      p += 1; } }
+              m.setXlist(numbytes, dy, i);
+          }
+
+```
+
+Code for the Temp Handler (jeff helped)
+```
+   public float[] tempHandler(SparkView sparkView, MainActivity m){
+        float[] usearr = m.gettempvals();
+        float sum = 0;
+        float max_ = 0;
+        float min_ = 1000;
+        float[] actualarr = new float[usearr.length];
+        int i = 0;
+        int zerocnt = 0;
+        for (float f:usearr){
+            if(f!=0){
+                actualarr[i] = f;
+                i += 1; }
+            else{
+                zerocnt += 1; }
+            sum += f;}
+        for (float f:usearr){
+            if(f>max_){
+                max_ = f;}
+            if(min_>f){
+                min_ = f;}}
+        float avg = 0;
+        if(usearr.length!=0){
+            avg = sum/(usearr.length-zerocnt);
+        }
+        if(sparkView!=null){
+            sparkView.setAdapter(new MyAdapter(usearr));
+        }
+        float[] ret = new float[2];
+        ret = new float[]{avg, max_};
+        return ret;
+    }
+    
+  ```
+  
+  ## Day 19 - 4/20/22
+  
+ 
+
+
