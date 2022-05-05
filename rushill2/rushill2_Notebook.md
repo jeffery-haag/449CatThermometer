@@ -1,5 +1,7 @@
 # ECE 445 Project Notebook - Pet Health Monitor 
-netid - rushill2
+NetID - rushill2
+Partners - jrhaag2, tthakur2
+TA - Hojoon Ryu
 
 ## Day 1 - 1/23/22
 **Goal**: to finalize the topic and possible design
